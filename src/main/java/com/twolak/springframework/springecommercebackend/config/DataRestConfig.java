@@ -1,5 +1,10 @@
 package com.twolak.springframework.springecommercebackend.config;
 
+import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
+import javax.persistence.metamodel.EntityType;
+
 import com.twolak.springframework.springecommercebackend.domain.Product;
 import com.twolak.springframework.springecommercebackend.domain.ProductCategory;
 
@@ -11,6 +16,12 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 @Configuration
 public class DataRestConfig implements RepositoryRestConfigurer {
+
+  private EntityManager entityManager;
+
+  public DataRestConfig(EntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
   @Override
   public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
@@ -24,5 +35,8 @@ public class DataRestConfig implements RepositoryRestConfigurer {
     config.getExposureConfiguration().forDomainType(ProductCategory.class)
       .withItemExposure((metadata, httpMethods) -> httpMethods.disable(theUnsuportedHttpMethods))
       .withCollectionExposure((metadata, httpMethods) -> httpMethods.disable(theUnsuportedHttpMethods));
+    
+    config.exposeIdsFor(entityManager.getMetamodel().getEntities()
+      .stream().map(EntityType::getJavaType).collect(Collectors.toList()).toArray(Class[]::new));
   }
 }

@@ -5,8 +5,10 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.metamodel.EntityType;
 
+import com.twolak.springframework.springecommercebackend.domain.Country;
 import com.twolak.springframework.springecommercebackend.domain.Product;
 import com.twolak.springframework.springecommercebackend.domain.ProductCategory;
+import com.twolak.springframework.springecommercebackend.domain.State;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
@@ -28,15 +30,18 @@ public class DataRestConfig implements RepositoryRestConfigurer {
     
     final HttpMethod[] theUnsuportedHttpMethods = {HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE, HttpMethod.PATCH};
 
-    config.getExposureConfiguration().forDomainType(Product.class)
-      .withItemExposure((metadata, httpMethods) -> httpMethods.disable(theUnsuportedHttpMethods))
-      .withCollectionExposure((metadata, httpMethods) -> httpMethods.disable(theUnsuportedHttpMethods));
-
-    config.getExposureConfiguration().forDomainType(ProductCategory.class)
-      .withItemExposure((metadata, httpMethods) -> httpMethods.disable(theUnsuportedHttpMethods))
-      .withCollectionExposure((metadata, httpMethods) -> httpMethods.disable(theUnsuportedHttpMethods));
+    disableHttpMethod(Product.class, config, theUnsuportedHttpMethods);
+    disableHttpMethod(ProductCategory.class, config, theUnsuportedHttpMethods);
+    disableHttpMethod(Country.class, config, theUnsuportedHttpMethods);
+    disableHttpMethod(State.class, config, theUnsuportedHttpMethods);
     
     config.exposeIdsFor(entityManager.getMetamodel().getEntities()
       .stream().map(EntityType::getJavaType).collect(Collectors.toList()).toArray(Class[]::new));
+  }
+
+  private void disableHttpMethod(Class theClass, RepositoryRestConfiguration config, final HttpMethod[] theUnsuportedHttpMethods) {
+    config.getExposureConfiguration().forDomainType(theClass)
+      .withItemExposure((metadata, httpMethods) -> httpMethods.disable(theUnsuportedHttpMethods))
+      .withCollectionExposure((metadata, httpMethods) -> httpMethods.disable(theUnsuportedHttpMethods));
   }
 }

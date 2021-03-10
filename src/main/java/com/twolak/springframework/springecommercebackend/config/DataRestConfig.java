@@ -39,7 +39,7 @@ public class DataRestConfig implements RepositoryRestConfigurer {
       .stream().map(EntityType::getJavaType).collect(Collectors.toList()).toArray(Class[]::new));
   }
 
-  private void disableHttpMethod(Class theClass, RepositoryRestConfiguration config, final HttpMethod[] theUnsuportedHttpMethods) {
+  private void disableHttpMethod(Class<?> theClass, RepositoryRestConfiguration config, final HttpMethod[] theUnsuportedHttpMethods) {
     config.getExposureConfiguration().forDomainType(theClass)
       .withItemExposure((metadata, httpMethods) -> httpMethods.disable(theUnsuportedHttpMethods))
       .withCollectionExposure((metadata, httpMethods) -> httpMethods.disable(theUnsuportedHttpMethods));

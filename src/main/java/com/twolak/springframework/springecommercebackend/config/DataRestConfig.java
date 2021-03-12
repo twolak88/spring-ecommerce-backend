@@ -10,6 +10,7 @@ import com.twolak.springframework.springecommercebackend.domain.Product;
 import com.twolak.springframework.springecommercebackend.domain.ProductCategory;
 import com.twolak.springframework.springecommercebackend.domain.State;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
@@ -20,6 +21,9 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 public class DataRestConfig implements RepositoryRestConfigurer {
 
   private EntityManager entityManager;
+
+  @Value("${allowed.origins}")
+  private String[] allowedOrigins;
 
   public DataRestConfig(EntityManager entityManager) {
     this.entityManager = entityManager;
@@ -37,6 +41,8 @@ public class DataRestConfig implements RepositoryRestConfigurer {
     
     config.exposeIdsFor(entityManager.getMetamodel().getEntities()
       .stream().map(EntityType::getJavaType).collect(Collectors.toList()).toArray(Class[]::new));
+
+    cors.addMapping(config.getBasePath() + "/**").allowedOrigins(allowedOrigins);
   }
 
   private void disableHttpMethod(Class<?> theClass, RepositoryRestConfiguration config, final HttpMethod[] theUnsuportedHttpMethods) {
